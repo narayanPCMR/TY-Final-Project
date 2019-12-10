@@ -1,11 +1,11 @@
-#Cascade Classifier training helper
+# Cascade Classifier training helper
 
-##Requirements
+## Requirements
 Download opencv <= 3.4 and copy opencv_traincascade.exe, opencv_createsamples.exe and opencv_world347d.dll here
 Install tqdm, opencv and numpy for python (using pip)
 
 
-##Usage
+## Usage
 Just run:
 python train.py
 or
@@ -22,7 +22,7 @@ cropper.py was used to take original pics of the object and crop them automatica
 
 
 
-##Meanings:
+## Meanings:
 train.py - Simplifies the commands and does some checking before running opencv_traincascade
 You have to run this script
 
@@ -39,9 +39,9 @@ augment.py - duplicates images with changes
 	"paper.vec" is created by opencv_createsamples
 
 While training:
-	POS count : consumed    <a> : <b>
+	POS count : consumed    [a] : [b]
 		a is how many positive images we are feeding, b is how many it is using
-	NEG count : acceptanceRatio    <a> : <b>
+	NEG count : acceptanceRatio    [a] : [b]
 		a is how many negative images we are feeding, b is the acceptance ratio of positive to negative
 			(b can be plotted on a graph vs stage, approaching 0)
 			(ideal value is 0.0003)
