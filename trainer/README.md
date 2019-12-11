@@ -39,9 +39,9 @@ augment.py - duplicates images with changes
 	"paper.vec" is created by opencv_createsamples
 
 While training:
-	POS count : consumed    [a] : [b]
+	POS count : consumed    <a> : <b>
 		a is how many positive images we are feeding, b is how many it is using
-	NEG count : acceptanceRatio    [a] : [b]
+	NEG count : acceptanceRatio    <a> : <b>
 		a is how many negative images we are feeding, b is the acceptance ratio of positive to negative
 			(b can be plotted on a graph vs stage, approaching 0)
 			(ideal value is 0.0003)
