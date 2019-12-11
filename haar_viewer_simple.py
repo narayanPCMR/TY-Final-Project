@@ -11,8 +11,8 @@ vid = cv2.VideoCapture(VIDSOURCE)
 
 faceCascade = cv2.CascadeClassifier(r'data/cascade.xml')
 
-scale = 1.3
-minN = 6
+scale = 1.2
+minN = 4
 
 
 oldFaces = []

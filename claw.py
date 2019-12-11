@@ -1,14 +1,13 @@
 import RPi.GPIO as GPIO
 import time
+import thread
 
 #TODO: This should be done once only
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-#TODO: Make a class
-
 class Arm:
-    pinList = {'claw': 20, 'linear':21, 'height':16}
+    pinList = {'claw': 20, 'linear': 21, 'height': 16}
     servos = {}
     
     def __init__(self):
@@ -31,32 +30,44 @@ class Arm:
         
         self.servos[servo_id][1] = pos
     
+    
+    def sweepServo(self, servo_id, pos):
+        th = threading.Thread(target = Arm.moveTowards, args = (self, servo_id, pos))
+        th.start()
+        return th
+    
     def openClaw(self):
-        self.moveTowards('claw', 60)
+        self.sweepServo('claw', 60).join()
     
     def closeClaw(self):
-        self.moveTowards('claw', 105)
+        self.sweepServo('claw', 105).join()
 
     def armRestingPos(self):
-        self.moveTowards('linear', 70)
-        self.moveTowards('height', 70)
+        arm_a = self.sweepServo('linear', 70)
+        arm_b = self.sweepServo('height', 70)
+        arm_a.join()
+        arm_b.join()
     
     def armReach(self):
-        self.moveTowards('linear', 105)
-        self.moveTowards('height', 105)
+        arm_a = self.sweepServo('linear', 105)
+        arm_b = self.sweepServo('height', 105)
+        arm_a.join()
+        arm_b.join()
 
 arm = Arm()
 arm.closeClaw()
-
 time.sleep(2)
-arm.openClaw()
-arm.armReach()
-time.sleep(1)
-arm.closeClaw()
-time.sleep(1)
-arm.armRestingPos()
-time.sleep(1)
-arm.openClaw()
+
+if __name__ == "__main__":
+    while True:
+        arm.openClaw()
+        arm.armReach()
+        time.sleep(1)
+        arm.closeClaw()
+        time.sleep(1)
+        arm.armRestingPos()
+        time.sleep(1)
+        arm.openClaw()
 
 """
 currPos1=7
@@ -122,23 +133,21 @@ def arm_reach():
             time.sleep(0.025)
     currPos2=10
 
-#Tester
-if __name__ == "__main__":
-    openClaw()
-    arm_resting_pos()
-    
-    time.sleep(1)
-    
-    arm_reach()
-    closeClaw()
-    
-    time.sleep(1)
-    
-    arm_resting_pos()
-    
-    time.sleep(2)
-    
-    openClaw()
+openClaw()
+arm_resting_pos()
+
+time.sleep(1)
+
+arm_reach()
+closeClaw()
+
+time.sleep(1)
+
+arm_resting_pos()
+
+time.sleep(2)
+
+openClaw()
 """
 
 '''
