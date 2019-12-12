@@ -1,10 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 import threading
-
-#TODO: This should be done once only
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
+from utils import Utils
 
 class Arm:
     pinList = {'claw': 20, 'linear': 21, 'height': 16}
@@ -54,6 +51,15 @@ class Arm:
     def armReach(self):
         arm_a = self.sweepServo('linear', 120)
         arm_b = self.sweepServo('height', 35)
+        arm_a.join()
+        arm_b.join()
+    
+    def armAt(self, percent):
+        lin = Utils.rangePercent(percent, 70, 120)
+        hei = Utils.rangePercent(percent, 80, 35)
+        
+        arm_a = self.sweepServo('linear', lin)
+        arm_b = self.sweepServo('height', hei)
         arm_a.join()
         arm_b.join()
 

@@ -14,8 +14,8 @@ if __name__ == "__main__":
     while True:
         distance=sonic()
         
-        if distance is not None:
-            if distance >= 10 and distance <= 15:
-                print("Arm move")
-                sleep(1)
-    
+        if distance >= 10 and distance <= 15:
+            print("Arm move")
+            sleep(1)
+        
+        sleep(0.2)
