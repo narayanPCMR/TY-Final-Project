@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 import time
-import thread
+import threading
 
 #TODO: This should be done once only
 GPIO.setmode(GPIO.BCM)
@@ -18,47 +18,48 @@ class Arm:
             self.servos[i] = [GPIO.PWM(self.pinList[i], 50), 70]
             self.servos[i][0].start(7)
     
-    def moveTowards(self, servo_id, pos):
+    def moveTowards(self, servo_id, pos, step_delay):
         if self.servos[servo_id][1] < pos:
             for i in range(self.servos[servo_id][1], pos):
                 self.servos[servo_id][0].ChangeDutyCycle(i / 10)
-                time.sleep(0.01)
+                time.sleep(step_delay)
         elif self.servos[servo_id][1] > pos:
             for i in range(self.servos[servo_id][1], pos, -1):
                 self.servos[servo_id][0].ChangeDutyCycle(i / 10)
-                time.sleep(0.01)
+                time.sleep(step_delay)
         
         self.servos[servo_id][1] = pos
     
     
-    def sweepServo(self, servo_id, pos):
-        th = threading.Thread(target = Arm.moveTowards, args = (self, servo_id, pos))
+    def sweepServo(self, servo_id, pos, step_delay = 0.03):
+        th = threading.Thread(target = Arm.moveTowards, args = (self, servo_id, pos, step_delay))
         th.start()
         return th
     
     def openClaw(self):
-        self.sweepServo('claw', 60).join()
+        self.sweepServo('claw', 60, 0.01).join()
     
     def closeClaw(self):
-        self.sweepServo('claw', 105).join()
+        self.sweepServo('claw', 105, 0.01).join()
 
     def armRestingPos(self):
         arm_a = self.sweepServo('linear', 70)
-        arm_b = self.sweepServo('height', 70)
+        arm_b = self.sweepServo('height', 80)
         arm_a.join()
         arm_b.join()
     
     def armReach(self):
-        arm_a = self.sweepServo('linear', 105)
-        arm_b = self.sweepServo('height', 105)
+        arm_a = self.sweepServo('linear', 120)
+        arm_b = self.sweepServo('height', 35)
         arm_a.join()
         arm_b.join()
 
-arm = Arm()
-arm.closeClaw()
-time.sleep(2)
-
 if __name__ == "__main__":
+    arm = Arm()
+    arm.closeClaw()
+    time.sleep(2)
+    
+    print("Start")
     while True:
         arm.openClaw()
         arm.armReach()
