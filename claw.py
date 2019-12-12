@@ -9,6 +9,7 @@ GPIO.setwarnings(False)
 class Arm:
     pinList = {'claw': 20, 'linear': 21, 'height': 16}
     servos = {}
+    claw_state = "open"
     
     def __init__(self):
         for i in self.pinList:
@@ -38,9 +39,11 @@ class Arm:
     
     def openClaw(self):
         self.sweepServo('claw', 60, 0.01).join()
+        self.claw_state = "open"
     
     def closeClaw(self):
         self.sweepServo('claw', 105, 0.01).join()
+        self.claw_state = "closed"
 
     def armRestingPos(self):
         arm_a = self.sweepServo('linear', 70)

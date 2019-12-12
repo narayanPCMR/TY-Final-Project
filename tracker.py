@@ -2,7 +2,7 @@ from camera import Camera
 import threading
 import cv2
 
-CASCADE = "data/haarcascade_frontalface_alt.xml"
+CASCADE = "data/cascade.xml"
 
 class Tracker:
     AllTrackers = []
