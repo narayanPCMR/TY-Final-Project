@@ -1,9 +1,9 @@
 #import RPi.GPIO as GPIO
-import time
+#import time
 from gpiozero import DistanceSensor
 
-class Ultrasonic:
-    sensor1 = DistanceSensor(echo=4, trigger=5, max_distance=2)
+#class Ultrasonic:
+#    sensor1 = DistanceSensor(echo=4, trigger=5, max_distance=2)
 
 """
 
