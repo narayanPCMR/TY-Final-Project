@@ -1,9 +1,15 @@
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import time
+from gpiozero import DistanceSensor
+
+class Ultrasonic:
+    sensor1 = DistanceSensor(echo=4, trigger=5, max_distance=2)
+
+"""
 
 #ultrasonics part ->intializing pins
-TRIG = 23#change pins according to convinence
-ECHO = 24
+TRIG = 5#change pins according to convinence
+ECHO = 4
 
 #intialize ultasonics
 GPIO.setup(TRIG,GPIO.OUT)                  #Set pin as GPIO out
@@ -14,7 +20,10 @@ def sonic():
     GPIO.output(TRIG, True)                  #Set TRIG as HIGH
     time.sleep(0.00001)                      #Delay of 0.00001 seconds
     GPIO.output(TRIG, False)                 #Set TRIG as LOW
-
+    
+    pulse_start = 0
+    pulse_end = 0
+    
     while GPIO.input(ECHO)==0:               #Check whether the ECHO is LOW
         pulse_start = time.time()              #Saves the last known time of LOW pulse
 
@@ -27,3 +36,4 @@ def sonic():
     distance = round(distance, 2)            #Round to two decimal points
     
     return distance
+"""

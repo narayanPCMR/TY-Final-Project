@@ -4,7 +4,7 @@ import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-from ultrasonic import sonic
+#from ultrasonic import sonic
 from claw import Arm
 from motors import MotorController
 from time import sleep
@@ -18,11 +18,11 @@ if __name__ == "__main__":
     
     print('Reading ultrasonic')
     while True:
-        distance=sonic()
-        print(distance)
+        #distance=sonic()
+        #print(distance)
         
-        if distance >= 10 and distance <= 15:
-            print("Arm move")
-            sleep(1)
+        #if distance >= 10 and distance <= 15:
+        #    print("Arm move")
+        #    sleep(1)
         
         sleep(0.2)

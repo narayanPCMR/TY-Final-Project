@@ -1,30 +1,36 @@
-import RPi.GPIO as GPIO
+import pigpio
 import time
 import threading
 from utils import Utils
 
 class Arm:
-    pinList = {'claw': 20, 'linear': 21, 'height': 16}
-    servos = {}
-    claw_state = "open"
+    CLAW_OPEN = 1200
+    CLAW_CLOSE = 2100
+    ARM_L_REST = 1400
+    ARM_L_DOWN = 2100
+    ARM_H_REST = 1800
+    ARM_H_DOWN = 600
+    
+    #pinList = {'claw': 13, 'linear': 19, 'height': 6}
+    servos = {'claw': [13, CLAW_CLOSE], 'linear': [19, ARM_L_REST], 'height': [6, ARM_H_REST]}
+    claw_state = "closed"
     
     def __init__(self):
-        for i in self.pinList:
-            GPIO.setup(self.pinList[i], GPIO.OUT)
-            
-            #Setup PWM 50Hz
-            self.servos[i] = [GPIO.PWM(self.pinList[i], 50), 70]
-            self.servos[i][0].start(7)
+        self.pi = pigpio.pi()
+        
+        for s in self.servos:
+            self.pi.set_servo_pulsewidth(*self.servos[s])
     
     def moveTowards(self, servo_id, pos, step_delay):
-        if self.servos[servo_id][1] < pos:
-            for i in range(self.servos[servo_id][1], pos):
-                self.servos[servo_id][0].ChangeDutyCycle(i / 10)
-                time.sleep(step_delay)
-        elif self.servos[servo_id][1] > pos:
-            for i in range(self.servos[servo_id][1], pos, -1):
-                self.servos[servo_id][0].ChangeDutyCycle(i / 10)
-                time.sleep(step_delay)
+        step_dir = 40
+        
+        if self.servos[servo_id][1] > pos:
+            step_dir = -40
+        
+        for i in range(self.servos[servo_id][1], pos, step_dir):
+            self.pi.set_servo_pulsewidth(self.servos[servo_id][0], i)
+            #self.servos[servo_id][0].ChangeDutyCycle(i / 10)
+            time.sleep(step_delay)
         
         self.servos[servo_id][1] = pos
     
@@ -35,28 +41,28 @@ class Arm:
         return th
     
     def openClaw(self):
-        self.sweepServo('claw', 60, 0.01).join()
+        self.sweepServo('claw', Arm.CLAW_OPEN, 0.05).join()
         self.claw_state = "open"
     
     def closeClaw(self):
-        self.sweepServo('claw', 105, 0.01).join()
+        self.sweepServo('claw', Arm.CLAW_CLOSE, 0.05).join()
         self.claw_state = "closed"
 
     def armRestingPos(self):
-        arm_a = self.sweepServo('linear', 70)
-        arm_b = self.sweepServo('height', 80)
+        arm_a = self.sweepServo('linear', Arm.ARM_L_REST)
+        arm_b = self.sweepServo('height', Arm.ARM_H_REST)
         arm_a.join()
         arm_b.join()
     
     def armReach(self):
-        arm_a = self.sweepServo('linear', 120)
-        arm_b = self.sweepServo('height', 35)
+        arm_a = self.sweepServo('linear', Arm.ARM_L_DOWN)
+        arm_b = self.sweepServo('height', Arm.ARM_H_DOWN)
         arm_a.join()
         arm_b.join()
     
     def armAt(self, percent):
-        lin = Utils.rangePercent(percent, 70, 120)
-        hei = Utils.rangePercent(percent, 80, 35)
+        lin = Utils.rangePercent(percent, Arm.ARM_L_REST, Arm.ARM_L_DOWN)
+        hei = Utils.rangePercent(percent, Arm.ARM_H_REST, Arm.ARM_H_DOWN)
         
         arm_a = self.sweepServo('linear', int(lin))
         arm_b = self.sweepServo('height', int(hei))

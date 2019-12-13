@@ -136,23 +136,37 @@
 
 			// ---- Keyboard ----
 			window.addEventListener('keydown', function(e) {
-				switch(e.keyCode) {
-					case KEY_W:
-					case KEY_UP:
-						goForward();
-						break;
-					case KEY_A:
-					case KEY_LEFT:
-						turnLeft();
-						break;
-					case KEY_S:
-					case KEY_DOWN:
-						goBackward();
-						break;
-					case KEY_D:
-					case KEY_RIGHT:
-						turnRight();
-						break;
+				if (!e.repeat) {
+					switch(e.keyCode) {
+						case KEY_W:
+						case KEY_UP:
+							goForward();
+							break;
+						case KEY_A:
+						case KEY_LEFT:
+							turnLeft();
+							break;
+						case KEY_S:
+						case KEY_DOWN:
+							goBackward();
+							break;
+						case KEY_D:
+						case KEY_RIGHT:
+							turnRight();
+							break;
+						
+						case 13:
+						case 10:
+							arm_clawToggle();
+							break;
+						
+						case 82:
+							arm_position_raised();
+							break;
+						case 70:
+							arm_position_lowered();
+							break;
+					}
 				}
 			});
 
