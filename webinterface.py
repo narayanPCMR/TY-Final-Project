@@ -3,6 +3,7 @@ from cv2 import imencode, rectangle, resize, FONT_HERSHEY_SIMPLEX, LINE_AA, putT
 from threading import Thread
 from motors import MotorController
 from time import time
+from utils import Utils
 
 appThread = None
 claw = None
@@ -79,10 +80,12 @@ def gpioFn():
         except:
             pass
             
-    #if 'togglemode' in request.args.keys():
-    #    if mode == 'auto':
-    #        mode = 'manual'
-    #    else:
-    #        mode = 'auto'
+    if 'togglemode' in request.args.keys():
+        if Utils.mode == 'auto':
+            Utils.mode = 'manual'
+        else:
+            Utils.mode = 'auto'
+        
+        return Utils.mode
             
     return ''

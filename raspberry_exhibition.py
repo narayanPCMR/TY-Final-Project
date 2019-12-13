@@ -8,6 +8,7 @@ GPIO.setwarnings(False)
 from claw import Arm
 from gpiozero import DistanceSensor
 from motors import MotorController
+from utils import Utils
 from time import sleep
 import webinterface
 
@@ -20,18 +21,19 @@ if __name__ == "__main__":
     
     print('Reading ultrasonic')
     while True:
-        distance=sensor1.distance
-        print(distance)
-        
-        if distance >= 0.10 and distance <= 0.15:
-            print("Arm move")
-            claw.openClaw()
-            claw.armReach()
-            sleep(1)
-            th = claw.sweepServo('claw', Arm.CLAW_CLOSE, 0.05)
-            claw.claw_state = "closed"
-            sleep(0.2)
-            claw.armRestingPos()
-            th.join()
+        if Utils.mode == "auto":
+            distance=sensor1.distance
+            print(distance)
+            
+            if distance >= 0.14 and distance <= 0.16:
+                print("Arm move")
+                claw.openClaw()
+                claw.armReach()
+                sleep(1)
+                th = claw.sweepServo('claw', Arm.CLAW_CLOSE, 0.05)
+                claw.claw_state = "closed"
+                sleep(0.2)
+                claw.armRestingPos()
+                th.join()
         
         sleep(0.2)

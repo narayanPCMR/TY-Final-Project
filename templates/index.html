@@ -7,9 +7,6 @@
 		<script src="/static/bootstrap.min.js"></script>
 
 		<script>
-		//XHR Object for sending the server Async Requests working.
-		var XHR;
-		
 		//How fast the Robot will move
 		var MovementSpeed = 1.0;
 
@@ -34,6 +31,7 @@
 
 		//TODO: One for servos, one for mode, etc.
 		function sendMotorSpeed(motor1Speed, motor2Speed) {
+			var XHR = new XMLHttpRequest();
 			var query = IO_REQUEST_PAGE + "?motor1Speed=" + motor1Speed + "&motor2Speed=" + motor2Speed;
 			
 			XHR.open('GET', query);
@@ -41,8 +39,14 @@
 		}
 		
 		function sendMode() {
+			var XHR = new XMLHttpRequest();
 			var query = IO_REQUEST_PAGE + "?togglemode";
 			XHR.open('GET', query);
+			XHR.addEventListener('readystatechange', function(e) {
+				if (XHR.readyState == 4) {
+					
+				}
+			});
 			XHR.send();
 		}
 
@@ -67,30 +71,35 @@
 		}
 		
 		function arm_position_raised() {
+			var XHR = new XMLHttpRequest();
 			var query = IO_REQUEST_PAGE + "?action=arm_raise";
 			XHR.open('GET', query);
 			XHR.send();
 		}
 		
 		function arm_position_lowered() {
+			var XHR = new XMLHttpRequest();
 			var query = IO_REQUEST_PAGE + "?action=arm_lower";
 			XHR.open('GET', query);
 			XHR.send();
 		}
 		
 		function setArm(servoName, position) {
+			var XHR = new XMLHttpRequest();
 			var query = IO_REQUEST_PAGE + "?arm_"+servoName+"="+position;
 			XHR.open('GET', query);
 			XHR.send();
 		}
 		
 		function armPercent(percent) {
+			var XHR = new XMLHttpRequest();
 			var query = IO_REQUEST_PAGE + "?arm_percent="+percent;
 			XHR.open('GET', query);
 			XHR.send();
 		}
 		
 		function arm_clawToggle() {
+			var XHR = new XMLHttpRequest();
 			var query = IO_REQUEST_PAGE + "?action=claw_toggle";
 			XHR.open('GET', query);
 			XHR.send();
@@ -115,8 +124,6 @@
 		}
 
 		function loaded() {
-			XHR = new XMLHttpRequest();
-			
 			// ---- Forward button ----
 			setEventToDirectionButton('up', goForward);
 			
