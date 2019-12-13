@@ -78,6 +78,18 @@
 			XHR.send();
 		}
 		
+		function setArm(servoName, position) {
+			var query = IO_REQUEST_PAGE + "?arm_"+servoName+"="+position;
+			XHR.open('GET', query);
+			XHR.send();
+		}
+		
+		function armPercent(percent) {
+			var query = IO_REQUEST_PAGE + "?arm_percent="+percent;
+			XHR.open('GET', query);
+			XHR.send();
+		}
+		
 		function arm_clawToggle() {
 			var query = IO_REQUEST_PAGE + "?action=claw_toggle";
 			XHR.open('GET', query);

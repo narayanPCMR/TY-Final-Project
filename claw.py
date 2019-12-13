@@ -58,8 +58,8 @@ class Arm:
         lin = Utils.rangePercent(percent, 70, 120)
         hei = Utils.rangePercent(percent, 80, 35)
         
-        arm_a = self.sweepServo('linear', lin)
-        arm_b = self.sweepServo('height', hei)
+        arm_a = self.sweepServo('linear', int(lin))
+        arm_b = self.sweepServo('height', int(hei))
         arm_a.join()
         arm_b.join()
 

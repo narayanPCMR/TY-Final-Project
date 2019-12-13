@@ -1,7 +1,7 @@
 from flask import Flask, render_template, Response, request
 from cv2 import imencode, rectangle, resize, FONT_HERSHEY_SIMPLEX, LINE_AA, putText
 from threading import Thread
-from ioc import IOController
+from motors import MotorController
 from time import time
 
 appThread = None
@@ -35,7 +35,7 @@ def gpioFn():
     if 'motor1Speed' in request.args.keys():
         try:
             mtrSpeed = int(request.args['motor1Speed'])
-            IOController.customLeftMotor(mtrSpeed)
+            MotorController.customLeftMotor(mtrSpeed)
             
         except ValueError:
             print("Bad input received:", request.args['motor1Speed'])
@@ -43,7 +43,7 @@ def gpioFn():
     if 'motor2Speed' in request.args.keys():
         try:
             mtrSpeed = int(request.args['motor2Speed'])
-            IOController.customRightMotor(mtrSpeed)
+            MotorController.customRightMotor(mtrSpeed)
             
         except ValueError:
             print("Bad input received:", request.args['motor2Speed'])
@@ -61,7 +61,24 @@ def gpioFn():
                     claw.closeClaw()
                 else:
                     claw.openClaw()
-                
+    if "arm_height" in request.args.keys():
+        try:
+            claw.sweepServo('height', int(request.args['arm_height']))
+        except:
+            pass
+    
+    if "arm_linear" in request.args.keys():
+        try:
+            claw.sweepServo('linear', int(request.args['arm_linear']))
+        except:
+            pass
+    
+    if "arm_percent" in request.args.keys():
+        try:
+            claw.armAt(int(request.args['arm_percent']) / 100.0)
+        except:
+            pass
+            
     #if 'togglemode' in request.args.keys():
     #    if mode == 'auto':
     #        mode = 'manual'
