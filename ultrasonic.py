@@ -3,7 +3,7 @@ import time
 
 #ultrasonics part ->intializing pins
 TRIG = 23#change pins according to convinence
-ECHO = 24      
+ECHO = 24
 
 #intialize ultasonics
 GPIO.setup(TRIG,GPIO.OUT)                  #Set pin as GPIO out

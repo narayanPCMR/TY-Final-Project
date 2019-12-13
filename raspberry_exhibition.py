@@ -1,4 +1,8 @@
 #Exhibition Demo
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+
 from ultrasonic import sonic
 from claw import Arm
 from ioc import IOController

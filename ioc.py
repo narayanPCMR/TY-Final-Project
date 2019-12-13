@@ -12,9 +12,6 @@ USING_PWM = True
 
 class IOController:
     def begin():
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
-        
         IOController.robot = gpiozero.Robot(left=(M1_FORWARDPIN, M1_BACKWARDPIN, M1_ENABLEPIN), right=(M2_FORWARDPIN, M2_BACKWARDPIN, M2_ENABLEPIN), pwm=USING_PWM)
     
     def forward():
