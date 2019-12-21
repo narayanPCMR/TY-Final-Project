@@ -44,7 +44,8 @@
 			XHR.open('GET', query);
 			XHR.addEventListener('readystatechange', function(e) {
 				if (XHR.readyState == 4) {
-					
+					var data = XHR.responseText;
+					document.getElementById('mode_text').innerText = "Mode: "+ data;
 				}
 			});
 			XHR.send();
@@ -136,9 +137,9 @@
 			// ---- Rotate Left ----
 			setEventToDirectionButton('left', turnLeft);
 			
-			clickAndTouch('arm_lift', ()=>{}, arm_position_raised);
-			clickAndTouch('arm_lower', ()=>{}, arm_position_lowered);
-			clickAndTouch('arm_claw_toggle', ()=>{}, arm_clawToggle);
+			$('#arm_lift').click(arm_position_raised);
+			$('#arm_lower').click(arm_position_lowered);
+			$('#arm_claw_toggle').click(arm_clawToggle);
 			
 
 			// ---- Keyboard ----
@@ -245,6 +246,10 @@
 						<div class="col-3">
 							<button class="btn btn-default" id="arm_claw_toggle">Claw</button>
 						</div>
+					</div>
+					
+					<div class="row">
+						<span id="mode_text"></span>
 					</div>
 				</div>
 			</div>

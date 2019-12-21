@@ -86,6 +86,7 @@ def gpioFn():
         else:
             Utils.mode = 'auto'
         
+        print("Mode changed to {}".format(Utils.mode))
         return Utils.mode
             
     return ''
