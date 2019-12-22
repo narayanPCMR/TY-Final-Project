@@ -1,5 +1,6 @@
 from camera import Camera
 from utils import Utils
+from time import time
 import threading
 import cv2
 
@@ -7,40 +8,46 @@ CASCADE = "data/cascade.xml"
 
 class Tracker:
     AllTrackers = []
+    GlobTrackerID = 0
     
     x = 0
     y = 0
     w = 0
     h = 0
+    id = 0
     trackedImg = None
     orb = None
     bf = None
+    lost_time = None
+    isTracking = False
     
-    def begin():
-        Tracker.multiTracker = cv2.MultiTracker_create()
-    
-    def __init__(self, x, y, w, h, img):
+    def __init__(self, bbox, img):
         #Position as percentage
+        x, y, w, h = bbox
         self.x = x / img.shape[1]
         self.y = y / img.shape[0]
         self.w = w / img.shape[1]
         self.h = h / img.shape[0]
         self.trackedImg = img[y:y+h,x:x+w]
         
-        #if len(Tracker.AllTrackers) > 0: return
-        
+        #Limit to 2 trackers
+        #if len(Tracker.AllTrackers) >= 2: return
+        ar = -1
         my_rect = (self.x, self.y, self.w, self.h)
         for trk in Tracker.AllTrackers:
             trk_rect = (trk.x, trk.y, trk.w, trk.h)
             intersect_rect = Utils.intersection(my_rect, trk_rect)
             ar = Utils.area(intersect_rect)
+            
             if ar > 0: break
         else:
-            self.tracker = cv2.TrackerCSRT_create()
-            
-            multiTracker.add(self.tracker, img, self.getPosTupleImage(img))
+            print(ar)
+            self.tracker = cv2.TrackerBoosting_create()
+            self.tracker.init(img, tuple(bbox))
             
             #Add the tracker to list of trackers
+            self.id = Tracker.GlobTrackerID
+            Tracker.GlobTrackerID += 1
             Tracker.AllTrackers.append(self)
         
     def getPosTupleImage(self, img):
@@ -48,26 +55,31 @@ class Tracker:
         w, h = int(self.w * img.shape[1]), int(self.h * img.shape[0])
         return (x, y, w, h)
     
-    def track(image_whole):
-        success, boxes = Tracker.multiTracker.update(image_whole)
-        print(success)
+    def track(self, image_whole):
+        success, box = self.tracker.update(image_whole)
         
-        #res = cv2.matchTemplate(image_whole, self.trackedImg, cv2.TM_CCOEFF)
-        #min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        #max_loc = (max_loc[0]/image_whole.shape[1], max_loc[1]/image_whole.shape[0])
-        
-        #if abs(max_loc[0]-self.x) > self.w*2 or abs(max_loc[1]-self.y) > self.h*2:
-        #    print("Object lost")
-        #else:
-        #    self.x, self.y = max_loc
-        
-        
-        print("[TODO]")
+        if success:
+            self.lost_time = None
+            self.isTracking = True
+            box_x = box[0] / image_whole.shape[1]
+            box_y = box[1] / image_whole.shape[0]
+            box_w = box[2] / image_whole.shape[1]
+            box_h = box[3] / image_whole.shape[0]
+            
+            self.x, self.y, self.w, self.h = box_x, box_y, box_w, box_h
+        else:
+            if self.lost_time is None:
+                self.lost_time = time()
+                print("Lost tracker {}".format(self.id))
+                self.isTracking = False
+            if time() - self.lost_time > 2.0:
+                print("Removing tracker {}".format(self.id))
+                Tracker.AllTrackers.remove(self)
 
 
 class Detector:
-    scale = 1.2
-    minN = 4
+    scale = 1.3
+    minN = 22
     
     def __init__(self):
         self.cascade = cv2.CascadeClassifier(CASCADE)
@@ -97,6 +109,6 @@ class Detector:
                 
                 objects = self.cascade.detectMultiScale(b, self.scale, self.minN)
                 for o in objects:
-                    Tracker(*o, img)
+                    Tracker(o, img)
             
             frameNo += 1
