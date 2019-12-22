@@ -5,12 +5,19 @@ import cv2
 
 if __name__ == "__main__":
     Camera.begin()
+    Tracker.begin()
     
     detector = Detector()
     detector.begin()
     
     for img in Camera.waitFrame():
         #a = 0
+        Tracker.track(img)
+            #x, y, w, h = t.getPosTupleImage(img)
+            #cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0))
+            #cv2.imshow("W" + str(a), t.trackedImg)
+            #a += 1
+        
         for t in Tracker.AllTrackers:
             x, y, w, h = t.getPosTupleImage(img)
             cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0))
