@@ -1,9 +1,50 @@
-#import RPi.GPIO as GPIO
-#import time
 from gpiozero import DistanceSensor
+from threading import Thread, Event
+from utils import Utils
+from time import sleep
 
-#class Ultrasonic:
-#    sensor1 = DistanceSensor(echo=4, trigger=5, max_distance=2)
+class AutoNavigator:
+    sensor1 = DistanceSensor(echo=18, trigger=17, max_distance=2)#set pins for sensor1
+    sensor2 = DistanceSensor(echo=23, trigger=24, max_distance=2)#set pins for sensor2
+    servo1 = Servo(14)#set pins for servo1
+    servo2 = Servo(15)#set pins for servo2
+    operating = False
+    
+    def begin():
+        AutoNavigator.th = Thread(target=AutoNavigator.update)
+        AutoNavigator.ev = Event()
+        AutoNavigator.th.start()
+    
+    def end():
+        AutoNavigator.ev.set()
+    
+    def engage():
+        AutoNavigator.operating = True
+        print("Navigating automatically.")
+    
+    def disengage():
+        AutoNavigator.operating = False
+    
+    def update():
+        while not AutoNavigator.ev.is_set():
+            while not AutoNavigator.operating:
+                sleep(0.1)
+            if Utils.pickupPhase == 1:
+                #Move servos so they face the front
+                AutoNavigator.servo1.min()
+                sleep(0.5)
+                a = AutoNavigator.sensor1.distance * 100
+                print(a)
+                AutoNavigator.servo1..mid()
+                sleep(0.5)
+                a=AutoNavigator.sensor1.distance * 100
+                print(a)
+                AutoNavigator.servo1..max()
+                sleep(0.5)
+                a=AutoNavigator.sensor1.distance * 100
+                print(a)
+                #Read the values continuously
+            
 
 """
 
