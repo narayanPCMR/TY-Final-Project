@@ -1,6 +1,7 @@
 
 class Utils:
     mode = "manual"
+    pickupPhase = 0
     
     def rangePercent(p, a, b):
         return (b-a)*p+a
