@@ -15,9 +15,7 @@ class Tracker:
     w = 0
     h = 0
     id = 0
-    trackedImg = None
-    orb = None
-    bf = None
+    
     lost_time = None
     isTracking = False
     
@@ -28,21 +26,20 @@ class Tracker:
         self.y = y / img.shape[0]
         self.w = w / img.shape[1]
         self.h = h / img.shape[0]
-        self.trackedImg = img[y:y+h,x:x+w]
+        #self.trackedImg = img[y:y+h,x:x+w]
         
         #Limit to 2 trackers
-        #if len(Tracker.AllTrackers) >= 2: return
+        if len(Tracker.AllTrackers) >= 5: return
+        
         ar = -1
         my_rect = (self.x, self.y, self.w, self.h)
         for trk in Tracker.AllTrackers:
             trk_rect = (trk.x, trk.y, trk.w, trk.h)
             intersect_rect = Utils.intersection(my_rect, trk_rect)
             ar = Utils.area(intersect_rect)
-            
             if ar > 0: break
         else:
-            print(ar)
-            self.tracker = cv2.TrackerBoosting_create()
+            self.tracker = cv2.TrackerCSRT_create()
             self.tracker.init(img, tuple(bbox))
             
             #Add the tracker to list of trackers
@@ -67,6 +64,14 @@ class Tracker:
             box_h = box[3] / image_whole.shape[0]
             
             self.x, self.y, self.w, self.h = box_x, box_y, box_w, box_h
+            
+            my_rect = (self.x, self.y, self.w, self.h)
+            for trk in Tracker.AllTrackers:
+                trk_rect = (trk.x, trk.y, trk.w, trk.h)
+                intersect_rect = Utils.intersection(my_rect, trk_rect)
+                ar = Utils.area(intersect_rect)
+                #if ar > 0:
+                #    return -1
         else:
             if self.lost_time is None:
                 self.lost_time = time()
@@ -78,8 +83,8 @@ class Tracker:
 
 
 class Detector:
-    scale = 1.3
-    minN = 22
+    scale = 1.2
+    minN = 3
     
     def __init__(self):
         self.cascade = cv2.CascadeClassifier(CASCADE)
@@ -110,5 +115,4 @@ class Detector:
                 objects = self.cascade.detectMultiScale(b, self.scale, self.minN)
                 for o in objects:
                     Tracker(o, img)
-            
             frameNo += 1

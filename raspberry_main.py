@@ -1,11 +1,15 @@
 from camera import Camera
 from tracker import Detector, Tracker
+from motors import MotorController
 from utils import Utils
+import webinterface
 
 import cv2
 
 if __name__ == "__main__":
     Camera.begin()
+    MotorController.begin()
+    webinterface.begin()
     
     detector = Detector()
     detector.begin()
@@ -13,7 +17,10 @@ if __name__ == "__main__":
     for img in Camera.waitFrame():
         #Update trackers
         for trk in Tracker.AllTrackers:
-            trk.track(img)
+            a = trk.track(img)
+            if a == -1:
+                Tracker.AllTrackers.remove(trk)
+                break
         
         draw = img.copy()
         #Draw trackers
@@ -28,12 +35,14 @@ if __name__ == "__main__":
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             cv2.rectangle(draw, (x, y), (x + w, y + h), color)
         
+        '''
         if len(Tracker.AllTrackers) > 1:
             for j in range(len(Tracker.AllTrackers)):
                 trk = Tracker.AllTrackers[j]
                 for i in range(j+1, len(Tracker.AllTrackers)):
                     intersect_rect = Utils.intersection(trk.getPosTupleImage(draw), Tracker.AllTrackers[i].getPosTupleImage(draw))
                     cv2.rectangle(draw, (intersect_rect[0], intersect_rect[1]), (intersect_rect[0] + intersect_rect[2], intersect_rect[1]+intersect_rect[3]), (255, 0, 0))
+        '''
         
         cv2.imshow("Win", draw)
         k = cv2.waitKey(16)

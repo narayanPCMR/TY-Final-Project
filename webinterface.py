@@ -35,7 +35,7 @@ def gpioFn():
     global ioc, claw
     if 'motor1Speed' in request.args.keys():
         try:
-            mtrSpeed = int(request.args['motor1Speed'])
+            mtrSpeed = float(request.args['motor1Speed'])
             MotorController.customLeftMotor(mtrSpeed)
             
         except ValueError:
@@ -43,7 +43,7 @@ def gpioFn():
     
     if 'motor2Speed' in request.args.keys():
         try:
-            mtrSpeed = int(request.args['motor2Speed'])
+            mtrSpeed = float(request.args['motor2Speed'])
             MotorController.customRightMotor(mtrSpeed)
             
         except ValueError:
