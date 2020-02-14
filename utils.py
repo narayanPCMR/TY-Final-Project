@@ -1,4 +1,14 @@
 
+class Pinout:
+    PIN_MOTORLEFT1 = 17#23#17
+    PIN_MOTORLEFT2 = 22#18#18
+    PIN_MOTORRIGHT1 = 18#17#22
+    PIN_MOTORRIGHT2 = 23#22#23
+    PIN_SERVOCLAW = 13
+    PIN_SERVOLEFT = 19
+    PIN_SERVORIGHT = 6
+
+
 class Utils:
     mode = "manual"
     pickupPhase = 0

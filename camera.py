@@ -1,4 +1,4 @@
-from cv2 import VideoCapture, waitKey, resize, putText, FONT_HERSHEY_SIMPLEX, LINE_AA, getTextSize
+from cv2 import VideoCapture, waitKey, resize, putText, FONT_HERSHEY_SIMPLEX, LINE_AA, getTextSize, flip
 from numpy import zeros
 import threading
 from time import time, sleep
@@ -34,6 +34,7 @@ class Camera:
         while not Camera.__stopEvent.is_set():
             ret, img = Camera.camera.read()
             if ret:
+                img = flip(img, 0)
                 #img = resize(img, (RESIZETO_WIDTH, RESIZETO_HEIGHT))
                 Camera.__currImg = img
                 Camera.__last_correct_frame = time()

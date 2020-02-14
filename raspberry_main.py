@@ -2,9 +2,14 @@ from camera import Camera
 from tracker import Detector, Tracker
 from motors import MotorController
 from utils import Utils
+from time import sleep
 import webinterface
 
 import cv2
+
+turnSpeed = 0.0
+
+TURNFACTOR = 0.4
 
 if __name__ == "__main__":
     Camera.begin()
@@ -14,15 +19,22 @@ if __name__ == "__main__":
     detector = Detector()
     detector.begin()
     
+    Utils.pickupPhase = 1
+    frameNumber = 0
+    
     for img in Camera.waitFrame():
+        MotorController.stop()
+        
         #Update trackers
         for trk in Tracker.AllTrackers:
+            #if frameNumber % 2 == 0:
             a = trk.track(img)
             if a == -1:
                 Tracker.AllTrackers.remove(trk)
                 break
-        
+                
         draw = img.copy()
+        
         #Draw trackers
         for t in Tracker.AllTrackers:
             x, y, w, h = t.getPosTupleImage(draw)
@@ -35,6 +47,27 @@ if __name__ == "__main__":
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             cv2.rectangle(draw, (x, y), (x + w, y + h), color)
         
+        if Utils.pickupPhase == 2:
+            if len(Tracker.AllTrackers) > 0:
+                tObj = Tracker.AllTrackers[0]
+                
+                #print("Tracker at:", tObj.x, tObj.y, tObj.w, tObj.h)
+                
+                #Calculate middle of rectangle, which is the actual value
+                actualX = (tObj.x+tObj.w/2)
+                targetX = 0.5
+                xError = targetX - actualX
+                
+                print("Error value is {:.3f}".format(xError))
+                
+                turnSpeed = xError * TURNFACTOR
+                
+                MotorController.customControl((0.7 + turnSpeed, 0.7 - turnSpeed))
+                sleep(0.1)
+            else:
+                #Object lost, go back to detecting
+                Utils.pickupPhase = 1
+        
         '''
         if len(Tracker.AllTrackers) > 1:
             for j in range(len(Tracker.AllTrackers)):
@@ -44,18 +77,30 @@ if __name__ == "__main__":
                     cv2.rectangle(draw, (intersect_rect[0], intersect_rect[1]), (intersect_rect[0] + intersect_rect[2], intersect_rect[1]+intersect_rect[3]), (255, 0, 0))
         '''
         
+        frameNumber += 1
         cv2.imshow("Win", draw)
         k = cv2.waitKey(16)
         
         if k == ord("s"):
             box = cv2.selectROI("Win", img, fromCenter=False,
                 showCrosshair=True)
-            Tracker(box, img)
+            bbox = [0,0,0,0]
+            bbox[0] = box[0] / img.shape[1]
+            bbox[1] = box[1] / img.shape[0]
+            bbox[2] = box[2] / img.shape[1]
+            bbox[3] = box[3] / img.shape[0]
+            Tracker(bbox, img)
+            Utils.pickupPhase = 2
+        
+        if k == ord("c"):
+            Tracker.AllTrackers = []
+            Utils.pickupPhase = 1
         
         if k == ord('q') or k == 27:
             break
     
     print("Quit")
+    MotorController.stop()
     detector.end()
     Camera.end()
     cv2.destroyAllWindows()

@@ -2,6 +2,7 @@ import pigpio
 import time
 import threading
 from utils import Utils
+from utils import Pinout
 
 class Arm:
     CLAW_OPEN = 1200
@@ -12,7 +13,7 @@ class Arm:
     ARM_H_DOWN = 600
     
     #pinList = {'claw': 13, 'linear': 19, 'height': 6}
-    servos = {'claw': [13, CLAW_CLOSE], 'linear': [19, ARM_L_REST], 'height': [6, ARM_H_REST]}
+    servos = {'claw': [Pinout.PIN_SERVOCLAW, CLAW_CLOSE], 'linear': [Pinout.PIN_SERVOLEFT, ARM_L_REST], 'height': [Pinout.PIN_SERVORIGHT, ARM_H_REST]}
     claw_state = "closed"
     
     def __init__(self):

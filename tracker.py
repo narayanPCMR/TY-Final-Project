@@ -21,7 +21,7 @@ class Tracker:
     
     def __init__(self, bbox, img):
         #Position as percentage
-        self.x, self.y, self.w, self.h = bbox[0], bbox[1], bbox[2], bbox[0]
+        self.x, self.y, self.w, self.h = bbox[0], bbox[1], bbox[2], bbox[3]
         
         x = int(self.x * img.shape[1])
         y = int(self.y * img.shape[0])
@@ -52,8 +52,8 @@ class Tracker:
         #    Tracker.AllTrackers.append(self)
         #
         
-        #self.tracker = cv2.TrackerCSRT_create()
-        #self.tracker.init(img, (x, y, w, h))
+        self.tracker = cv2.TrackerCSRT_create()
+        self.tracker.init(img, (x, y, w, h))
         self.id = Tracker.GlobTrackerID
         Tracker.GlobTrackerID += 1
         Tracker.AllTrackers.append(self)
@@ -67,9 +67,9 @@ class Tracker:
     
     def track(self, image_whole):
         if Utils.pickupPhase == 2:
-            success = False
-            #success, box = self.tracker.update(image_whole)
-            box = [0,0,0,0]
+            success = True
+            success, box = self.tracker.update(image_whole)
+            #box = [0,0,0,0]
             
             if success:
                 self.lost_time = None
