@@ -3,6 +3,7 @@ from tracker import Detector, Tracker
 from motors import MotorController
 from utils import Utils
 from time import sleep
+from Stage0 import Distance
 import webinterface
 
 import cv2
@@ -15,12 +16,14 @@ if __name__ == "__main__":
     Camera.begin()
     MotorController.begin()
     webinterface.begin()
+    Distance.begin()
     
     detector = Detector()
     detector.begin()
     
-    Utils.pickupPhase = 1
+    Utils.pickupPhase = 0
     frameNumber = 0
+    
     
     for img in Camera.waitFrame():
         MotorController.stop()
@@ -47,6 +50,21 @@ if __name__ == "__main__":
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             cv2.rectangle(draw, (x, y), (x + w, y + h), color)
         
+        if Utils.pickupPhase == 0:
+            d = Distance.distance()
+            if(d < 20):
+                print("Checking if any paper is detected...")
+                detections = detector.detect(img)
+                if len(detections) > 0:
+                    print("Paper detected! Moving to phase 1")
+                    Utils.pickupPhase = 1
+                else:
+                    print("Nope! not paper, will turn around")
+                    while Distance.distance() < 20:
+                        print("Spinning round and round")
+                        MotorController.right()
+                        sleep(0.05)
+                    MotorController.stop()
         if Utils.pickupPhase == 2:
             if len(Tracker.AllTrackers) > 0:
                 tObj = Tracker.AllTrackers[0]
@@ -66,7 +84,7 @@ if __name__ == "__main__":
                 sleep(0.1)
             else:
                 #Object lost, go back to detecting
-                Utils.pickupPhase = 1
+                Utils.pickupPhase = 0
         
         '''
         if len(Tracker.AllTrackers) > 1:
@@ -94,7 +112,7 @@ if __name__ == "__main__":
         
         if k == ord("c"):
             Tracker.AllTrackers = []
-            Utils.pickupPhase = 1
+            Utils.pickupPhase = 0
         
         if k == ord('q') or k == 27:
             break

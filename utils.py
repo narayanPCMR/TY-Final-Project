@@ -7,6 +7,7 @@ class Pinout:
     PIN_SERVOCLAW = 13
     PIN_SERVOLEFT = 19
     PIN_SERVORIGHT = 6
+    PIN_SERVOROTATE = 26
 
 
 class Utils:
