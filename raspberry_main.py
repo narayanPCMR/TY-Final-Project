@@ -1,4 +1,5 @@
 from camera import Camera
+from claw import Arm
 from tracker import Detector, Tracker
 from motors import MotorController
 from utils import Utils
@@ -65,6 +66,13 @@ if __name__ == "__main__":
                         MotorController.right()
                         sleep(0.05)
                     MotorController.stop()
+                    
+        if Utils.pickupPhase ==3:
+            Arm.openClaw()
+            Arm.armReach()
+            Arm.closeClaw()
+            Utils.pickupPhase=4
+            
         if Utils.pickupPhase == 2:
             if len(Tracker.AllTrackers) > 0:
                 tObj = Tracker.AllTrackers[0]
