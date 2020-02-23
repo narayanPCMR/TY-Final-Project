@@ -67,11 +67,18 @@ if __name__ == "__main__":
                         sleep(0.05)
                     MotorController.stop()
                     
-        if Utils.pickupPhase ==3:
+        if Utils.pickupPhase == 3:
             Arm.openClaw()
             Arm.armReach()
             Arm.closeClaw()
+            print("paper ball grabbed")
             Utils.pickupPhase=4
+        
+        if Utils.pickupPhase == 4:
+            arm.rotateClawBack()
+            arm.rotateClawFront()
+            print("paper ball put in dustbin")
+            Utils.pickupPhase=1
             
         if Utils.pickupPhase == 2:
             if len(Tracker.AllTrackers) > 0:
