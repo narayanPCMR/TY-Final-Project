@@ -75,8 +75,8 @@ if __name__ == "__main__":
             Utils.pickupPhase=4
         
         if Utils.pickupPhase == 4:
-            arm.rotateClawBack()
-            arm.rotateClawFront()
+            Arm.rotateClawBack()
+            Arm.rotateClawFront()
             print("paper ball put in dustbin")
             Utils.pickupPhase=1
             
