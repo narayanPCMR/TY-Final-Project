@@ -15,7 +15,7 @@ import webinterface
 if __name__ == "__main__":
     MotorController.begin()
     claw = Arm()
-    sensor1 = DistanceSensor(echo=4, trigger=5, max_distance=2)
+    sensor1 = DistanceSensor(echo=4, trigger=24, max_distance=2)
     webinterface.setClawObj(claw)
     webinterface.begin()
     
@@ -25,7 +25,7 @@ if __name__ == "__main__":
             distance=sensor1.distance
             print(distance)
             
-            if distance >= 0.13 and distance <= 0.19:
+            if distance >= 0.13 and distance <= 0.25:
                 print("Arm move")
                 claw.openClaw()
                 claw.armReach()

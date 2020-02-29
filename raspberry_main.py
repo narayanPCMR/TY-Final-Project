@@ -71,12 +71,14 @@ if __name__ == "__main__":
             Arm.openClaw()
             Arm.armReach()
             Arm.closeClaw()
+            Arm.armRestingPos()
             print("paper ball grabbed")
             Utils.pickupPhase=4
         
         if Utils.pickupPhase == 4:
             Arm.rotateClawBack()
             Arm.rotateClawFront()
+            Arm.openClaw()
             print("paper ball put in dustbin")
             Utils.pickupPhase=1
             

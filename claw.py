@@ -8,15 +8,20 @@ class Arm:
     CLAW_OPEN = 1200
     CLAW_CLOSE = 2100
     ARM_L_REST = 1400
-    ARM_L_DOWN = 2100
+    ARM_L_DOWN = 2250
     ARM_H_REST = 1800
     ARM_H_DOWN = 600
     CLAW_ROTATE_FRONT = 500
     CLAW_ROTATE_BACK = 2500
 
     
-    #pinList = {'claw': 13, 'linear': 19, 'height': 6}
-    servos = {'claw': [Pinout.PIN_SERVOCLAW, CLAW_CLOSE], 'linear': [Pinout.PIN_SERVOLEFT, ARM_L_REST], 'height': [Pinout.PIN_SERVORIGHT, ARM_H_REST],'rotate':[Pinout.PIN_SERVOROTATE, CLAW_ROTATE_FRONT]}
+    #pinList = {'claw': 13, 'linear': 19, 'height': 6,'rotate':26}
+    servos = {'claw': [Pinout.PIN_SERVOCLAW, CLAW_CLOSE],
+              'linear': [Pinout.PIN_SERVOLEFT, ARM_L_REST],
+              'height': [Pinout.PIN_SERVORIGHT, ARM_H_REST],
+              'rotate':[Pinout.PIN_SERVOROTATE, CLAW_ROTATE_FRONT]
+              }
+    
     claw_state = "closed"
     
     def __init__(self):
@@ -86,20 +91,17 @@ if __name__ == "__main__":
     
     print("Start")
     while True:
-        #arm.openClaw()
-        #arm.armReach()
-        #time.sleep(1)
-        #arm.closeClaw()
-        #time.sleep(1)
+        arm.openClaw()
+        arm.armReach()
+        arm.closeClaw()
+        arm.armRestingPos()
+        print("paper ball grabbed")        
         arm.rotateClawBack()
         time.sleep(1)
-        #arm.armRestingPos()
-        #time.sleep(1)
-        #arm.openClaw()
-        #time.sleep(1)
+        arm.openClaw()
         arm.rotateClawFront()
-        time.sleep(1)
-
+        print("paper ball put in dustbin")
+        
 """
 currPos1=7
 currPos2=8
