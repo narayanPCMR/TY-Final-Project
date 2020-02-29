@@ -208,21 +208,21 @@
 						<tr>
 							<td></td>
 							<td>
-								<button class="btn btn-default btn-lg btn-block" id="up">&#8593</button>
+								<button class="btn btn-success btn-lg btn-block" id="up">&#8593</button>
 							</td>
 							<td></td>
 						</tr>
 						
 						<tr>
-							<td><button class="btn btn-default btn-lg btn-block" id="left">&#8592</button></td>
+							<td><button class="btn btn-info btn-lg btn-block" id="left">&#8592</button></td>
 							<td><button class="btn btn-default btn-lg btn-block" id="auto_manual">Mode</button></td>
-							<td><button class="btn btn-default btn-lg btn-block" id="right">&#8594</button></td>
+							<td><button class="btn btn-warning btn-lg btn-block" id="right">&#8594</button></td>
 						</tr>
 						
 						<tr>
 							<td></td>
 								<td>
-									<button class="btn btn-default btn-lg btn-block" id="down">&#8595</button>
+									<button class="btn btn-danger btn-lg btn-block" id="down">&#8595</button>
 								</td>
 							<td></td>
 						</tr>
@@ -236,22 +236,15 @@
 				
 				<!-- Arm Controls -->
 				<div class="col-sm-4">
-					<div class="row">
-						<div class="col-3">
-							<button class="btn btn-default" id="arm_lift">Lift arm</button>
-						</div>
-						<div class="col-3">
-							<button class="btn btn-default" id="arm_lower">Lower arm</button>
-						</div>
-						<div class="col-3">
-							<button class="btn btn-default" id="arm_claw_toggle">Claw</button>
-						</div>
-					</div>
-					
-					<div class="row">
-						<span id="mode_text"></span>
-					</div>
-				</div>
+					<table class="table">
+						<tr>
+							<td><button style="margin:15px" class="btn btn-danger" id="arm_lower">Lower arm</button></td>
+							<td><button style="margin:15px" class="btn btn-success" id="arm_lift">Lift arm</button></td>
+							<td><button style="margin:15px" class="btn btn-warning" id="arm_claw_toggle">Claw</button></td>
+						</tr>
+						<tr><td style="text-align:center" colspan="3"><span id="mode_text"</span></td></tr>
+					</table>
+				</div>			
 			</div>
 		</div>
 	</body>
