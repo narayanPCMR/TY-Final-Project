@@ -5,7 +5,7 @@ from time import sleep
 class Distance:
     
     def begin():
-        Distance.sensor = DistanceSensor(echo=20, trigger=21)
+        Distance.sensor = DistanceSensor(echo=4, trigger=24)
     
     def distance():
         distance= Distance.sensor.distance * 100

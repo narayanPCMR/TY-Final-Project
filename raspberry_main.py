@@ -59,12 +59,13 @@ if __name__ == "__main__":
                 if len(detections) > 0:
                     print("Paper detected! Moving to phase 1")
                     Utils.pickupPhase = 1
+                    #Utils.pickupPhase = 2
                 else:
                     print("Nope! not paper, will turn around")
                     while Distance.distance() < 20:
                         print("Spinning round and round")
                         MotorController.right()
-                        sleep(0.05)
+                        #sleep(0.05)
                     MotorController.stop()
                     
         if Utils.pickupPhase == 3:
@@ -80,7 +81,7 @@ if __name__ == "__main__":
             Arm.rotateClawFront()
             Arm.openClaw()
             print("paper ball put in dustbin")
-            Utils.pickupPhase=1
+            Utils.pickupPhase=0
             
         if Utils.pickupPhase == 2:
             if len(Tracker.AllTrackers) > 0:

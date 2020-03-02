@@ -12,7 +12,8 @@ M2_ENABLEPIN   = None
 USING_PWM = True
 
 class MotorController:
-    speed = 0.9
+    #speed = 0.9
+    speed = 1.0
     robot = None
     def begin():
         MotorController.robot = gpiozero.Robot(left=(M1_FORWARDPIN, M1_BACKWARDPIN), right=(M2_FORWARDPIN, M2_BACKWARDPIN), pwm=USING_PWM)
