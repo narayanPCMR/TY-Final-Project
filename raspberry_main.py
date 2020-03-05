@@ -3,7 +3,7 @@ from claw import Arm
 from tracker import Detector, Tracker
 from motors import MotorController
 from utils import Utils
-from time import sleep
+from time import sleep, time
 from Stage0 import Distance
 import webinterface
 
@@ -21,22 +21,18 @@ if __name__ == "__main__":
     
     detector = Detector()
     detector.begin()
+    Tracker.begin()
+    
+    arm = Arm()
+    
+    webinterface.setClawObj(arm)
     
     Utils.pickupPhase = 0
     frameNumber = 0
     
+    print("Starting")
     
     for img in Camera.waitFrame():
-        MotorController.stop()
-        
-        #Update trackers
-        for trk in Tracker.AllTrackers:
-            #if frameNumber % 2 == 0:
-            a = trk.track(img)
-            if a == -1:
-                Tracker.AllTrackers.remove(trk)
-                break
-                
         draw = img.copy()
         
         #Draw trackers
@@ -51,67 +47,56 @@ if __name__ == "__main__":
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             cv2.rectangle(draw, (x, y), (x + w, y + h), color)
         
-        if Utils.pickupPhase == 0:
-            d = Distance.distance()
-            if(d < 20):
-                print("Checking if any paper is detected...")
-                detections = detector.detect(img)
-                if len(detections) > 0:
-                    print("Paper detected! Moving to phase 1")
-                    Utils.pickupPhase = 1
-                    #Utils.pickupPhase = 2
-                else:
-                    print("Nope! not paper, will turn around")
-                    while Distance.distance() < 20:
-                        print("Spinning round and round")
-                        MotorController.right()
-                        #sleep(0.05)
-                    MotorController.stop()
-                    
+        Distance.loop()
+        
         if Utils.pickupPhase == 3:
-            Arm.openClaw()
-            Arm.armReach()
-            Arm.closeClaw()
-            Arm.armRestingPos()
+            arm.openClaw()
+            arm.armReach()
+            arm.closeClaw()
+            arm.armRestingPos()
             print("paper ball grabbed")
             Utils.pickupPhase=4
         
         if Utils.pickupPhase == 4:
-            Arm.rotateClawBack()
-            Arm.rotateClawFront()
-            Arm.openClaw()
+            arm.rotateClawBack()
+            arm.openClaw()
+            arm.rotateClawFront()
+            arm.closeClaw()
             print("paper ball put in dustbin")
             Utils.pickupPhase=0
             
         if Utils.pickupPhase == 2:
             if len(Tracker.AllTrackers) > 0:
-                tObj = Tracker.AllTrackers[0]
+                t = time()
                 
-                #print("Tracker at:", tObj.x, tObj.y, tObj.w, tObj.h)
-                
-                #Calculate middle of rectangle, which is the actual value
-                actualX = (tObj.x+tObj.w/2)
-                targetX = 0.5
-                xError = targetX - actualX
-                
-                print("Error value is {:.3f}".format(xError))
-                
-                turnSpeed = xError * TURNFACTOR
-                
-                MotorController.customControl((0.7 + turnSpeed, 0.7 - turnSpeed))
-                sleep(0.1)
+                while time() - t < 0.3:
+                    d = Distance.distance()
+                    
+                    if d <= 12.0:
+                        Utils.pickupPhase = 3
+                        break
+                    
+                    tObj = Tracker.AllTrackers[0]
+                    
+                    #print("Tracker at:", tObj.x, tObj.y, tObj.w, tObj.h)
+                    
+                    #Calculate middle of rectangle, which is the actual value
+                    actualX = (tObj.x+tObj.w/2)
+                    targetX = 0.5
+                    xError = targetX - actualX
+                    
+                    print("Error value is {:.3f}".format(xError))
+                    
+                    turnSpeed = xError * TURNFACTOR
+                    
+                    MotorController.customControl((0.7 + turnSpeed, 0.7 - turnSpeed))
+                    
+                    #~ 2 frames
+                    sleep(0.05)
+                MotorController.stop()
             else:
                 #Object lost, go back to detecting
                 Utils.pickupPhase = 0
-        
-        '''
-        if len(Tracker.AllTrackers) > 1:
-            for j in range(len(Tracker.AllTrackers)):
-                trk = Tracker.AllTrackers[j]
-                for i in range(j+1, len(Tracker.AllTrackers)):
-                    intersect_rect = Utils.intersection(trk.getPosTupleImage(draw), Tracker.AllTrackers[i].getPosTupleImage(draw))
-                    cv2.rectangle(draw, (intersect_rect[0], intersect_rect[1]), (intersect_rect[0] + intersect_rect[2], intersect_rect[1]+intersect_rect[3]), (255, 0, 0))
-        '''
         
         frameNumber += 1
         cv2.imshow("Win", draw)
@@ -138,5 +123,6 @@ if __name__ == "__main__":
     print("Quit")
     MotorController.stop()
     detector.end()
+    Tracker.end()
     Camera.end()
     cv2.destroyAllWindows()

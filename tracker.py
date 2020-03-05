@@ -18,6 +18,7 @@ class Tracker:
     
     lost_time = None
     isTracking = False
+    trkTh = None
     
     def __init__(self, bbox, img):
         #Position as percentage
@@ -65,39 +66,51 @@ class Tracker:
         return (x, y, w, h)
     
     
-    def track(self, image_whole):
-        if Utils.pickupPhase == 2:
-            success = True
-            success, box = self.tracker.update(image_whole)
-            #box = [0,0,0,0]
+    def begin():
+        #Create a thread
+        Tracker.trkTh = threading.Thread(target=Tracker.trackerLoop)
+        Tracker.trkStopEv = threading.Event()
+    
+    def end():
+        Tracker.trkStopEv.set()
+        if Tracker.trkTh != None:
+            Tracker.trkTh.join()
+    
+    def trackerLoop():
+        for img in Camera.waitFrame():
+            if Utils.pickupPhase != 2:
+                continue
             
-            if success:
-                self.lost_time = None
-                self.isTracking = True
+            for tr in Tracker.AllTrackers:
+                a = trk.track(img)
                 
-                box_x = box[0] / image_whole.shape[1]
-                box_y = box[1] / image_whole.shape[0]
-                box_w = (box[2] / image_whole.shape[1])
-                box_h = (box[3] / image_whole.shape[0])
-                
-                self.x, self.y, self.w, self.h = box_x, box_y, box_w, box_h
-                
-                my_rect = (self.x, self.y, self.w, self.h)
-                for trk in Tracker.AllTrackers:
-                    trk_rect = (trk.x, trk.y, trk.w, trk.h)
-                    intersect_rect = Utils.intersection(my_rect, trk_rect)
-                    ar = Utils.area(intersect_rect)
-                    #if ar > 0:
-                    #    return -1
-            else:
-                if self.lost_time is None:
-                    self.lost_time = time()
-                    print("Lost tracker {}".format(self.id))
-                    self.isTracking = False
-                if time() - self.lost_time > 2.0:
-                    print("Removing tracker {}".format(self.id))
-                    Utils.pickupPhase = 1
-                    Tracker.AllTrackers.remove(self)
+                if a == -1:
+                    Tracker.AllTrackers.remove(trk)
+                    break
+    
+    
+    def track(self, image_whole):
+        success, box = self.tracker.update(image_whole)
+        
+        if success:
+            self.lost_time = None
+            self.isTracking = True
+            
+            box_x = box[0] / image_whole.shape[1]
+            box_y = box[1] / image_whole.shape[0]
+            box_w = (box[2] / image_whole.shape[1])
+            box_h = (box[3] / image_whole.shape[0])
+            
+            self.x, self.y, self.w, self.h = box_x, box_y, box_w, box_h
+        else:
+            if self.lost_time is None:
+                self.lost_time = time()
+                print("Lost tracker {}".format(self.id))
+                self.isTracking = False
+            if time() - self.lost_time > 2.0:
+                print("Removing tracker {}".format(self.id))
+                Utils.pickupPhase = 1
+                Tracker.AllTrackers.remove(self)
 
 
 class CascadeDetector:
@@ -134,12 +147,13 @@ class DNNDetector:
                 class_id = int(detection[1])
                 image_height, image_width, _ = image.shape
                 
-                box_x = detection[3]# * image_width
-                box_y = detection[4]# * image_height
-                box_width = detection[5] - box_x# * image_width
-                box_height = detection[6] - box_y# * image_height
+                box_x = detection[3]
+                box_y = detection[4]
+                box_width = detection[5] - box_x
+                box_height = detection[6] - box_y
                 detections.append((box_x, box_y, box_width, box_height))
-                print(class_id, confidence)
+                
+                print("Paper get!", confidence)
                 
         return detections
 
