@@ -70,6 +70,7 @@ class Tracker:
         #Create a thread
         Tracker.trkTh = threading.Thread(target=Tracker.trackerLoop)
         Tracker.trkStopEv = threading.Event()
+        Tracker.trkTh.start()
     
     def end():
         Tracker.trkStopEv.set()
@@ -78,6 +79,8 @@ class Tracker:
     
     def trackerLoop():
         for img in Camera.waitFrame():
+            if Tracker.trkStopEv.is_set():
+                break
             if Utils.pickupPhase != 2:
                 continue
             

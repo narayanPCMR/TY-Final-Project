@@ -27,7 +27,7 @@ if __name__ == "__main__":
     
     webinterface.setClawObj(arm)
     
-    Utils.pickupPhase = 0
+    Utils.pickupPhase = 1
     frameNumber = 0
     
     print("Starting")
