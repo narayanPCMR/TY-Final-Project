@@ -8,6 +8,8 @@ class Pinout:
     PIN_SERVOLEFT = 19
     PIN_SERVORIGHT = 6
     PIN_SERVOROTATE = 26
+    PIN_ULTRASOINIC_TRIG = 24
+    PIN_ULTRASOINIC_ECHO = 4
 
 
 class Utils:

@@ -1,11 +1,11 @@
-from utils import Utils
+from utils import Utils, Pinout
 from gpiozero import DistanceSensor
 from time import sleep
 
 class Distance:
     
     def begin():
-        Distance.sensor = DistanceSensor(echo=4, trigger=24)
+        Distance.sensor = DistanceSensor(echo=Pinout.PIN_ULTRASOINIC_ECHO, trigger=Pinout.PIN_ULTRASOINIC_TRIG)
     
     def distance():
         distance= Distance.sensor.distance * 100
@@ -14,7 +14,8 @@ class Distance:
     def loop():
         if Utils.pickupPhase == 0:
             d = Distance.distance()
-            if(d < 20):
+            print("Stage 0,", d, "cm")
+            if(d < 80):
                 print("Something found infront of me! Moving to phase 1")
                 Utils.pickupPhase = 1
                 

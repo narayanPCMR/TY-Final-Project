@@ -11,7 +11,7 @@ import cv2
 
 turnSpeed = 0.0
 
-TURNFACTOR = 0.4
+TURNFACTOR = -0.6
 
 if __name__ == "__main__":
     Camera.begin()
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     
     webinterface.setClawObj(arm)
     
-    Utils.pickupPhase = 1
+    Utils.pickupPhase = 0
     frameNumber = 0
     
     print("Starting")
@@ -52,7 +52,11 @@ if __name__ == "__main__":
         if Utils.pickupPhase == 3:
             arm.openClaw()
             arm.armReach()
+            MotorController.speed = 0.7
+            MotorController.forward()
             arm.closeClaw()
+            MotorController.speed = 0.9
+            MotorController.stop()
             arm.armRestingPos()
             print("paper ball grabbed")
             Utils.pickupPhase=4
@@ -64,15 +68,18 @@ if __name__ == "__main__":
             arm.closeClaw()
             print("paper ball put in dustbin")
             Utils.pickupPhase=0
+            Tracker.AllTrackers = []
             
         if Utils.pickupPhase == 2:
             if len(Tracker.AllTrackers) > 0:
+                Tracker.AllTrackers[0].track(img)
                 t = time()
                 
-                while time() - t < 0.3:
+                while time() - t < 0.2:
                     d = Distance.distance()
+                    print(d)
                     
-                    if d <= 12.0:
+                    if d <= 25.0:
                         Utils.pickupPhase = 3
                         break
                     
@@ -89,11 +96,11 @@ if __name__ == "__main__":
                     
                     turnSpeed = xError * TURNFACTOR
                     
-                    MotorController.customControl((0.7 + turnSpeed, 0.7 - turnSpeed))
+                    MotorController.customControl((max(min(0.7 + turnSpeed, 1), 0), max(min(0.7 - turnSpeed, 1), 0)))
                     
-                    #~ 2 frames
-                    sleep(0.05)
                 MotorController.stop()
+                #~ 2 frames
+                #sleep(0.5)
             else:
                 #Object lost, go back to detecting
                 Utils.pickupPhase = 0

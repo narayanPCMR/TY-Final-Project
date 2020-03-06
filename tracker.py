@@ -78,8 +78,10 @@ class Tracker:
             Tracker.trkTh.join()
     
     def trackerLoop():
+        return
         for img in Camera.waitFrame():
             if Tracker.trkStopEv.is_set():
+                print("Tracker stopped")
                 break
             if Utils.pickupPhase != 2:
                 continue
@@ -146,8 +148,10 @@ class DNNDetector:
         detections = []
         for detection in output[0,0,:,:]:
             confidence = detection[2]
-            if confidence > .5:
+            print("Detection found with confidence:", confidence)
+            if confidence > .6:
                 class_id = int(detection[1])
+                print("Accepted a paper")
                 image_height, image_width, _ = image.shape
                 
                 box_x = detection[3]
@@ -156,7 +160,8 @@ class DNNDetector:
                 box_height = detection[6] - box_y
                 detections.append((box_x, box_y, box_width, box_height))
                 
-                print("Paper get!", confidence)
+                print("Got paper!", confidence)
+                break
                 
         return detections
 
