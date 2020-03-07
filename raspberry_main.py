@@ -6,6 +6,7 @@ from utils import Utils
 from time import sleep, time
 from Stage0 import Distance
 import webinterface
+from speech import Speech 
 
 import cv2
 
@@ -18,11 +19,11 @@ if __name__ == "__main__":
     MotorController.begin()
     webinterface.begin()
     Distance.begin()
-    
+    speech=Speech()
     detector = Detector()
     detector.begin()
     Tracker.begin()
-    
+    speech.speak(speech.ON)
     arm = Arm()
     
     webinterface.setClawObj(arm)
@@ -121,10 +122,13 @@ if __name__ == "__main__":
             Utils.pickupPhase = 2
         
         if k == ord("c"):
+            
             Tracker.AllTrackers = []
+            speech.speak(speech.Restart)
             Utils.pickupPhase = 0
         
         if k == ord('q') or k == 27:
+            speech.speak(speech.OFF)
             break
     
     print("Quit")

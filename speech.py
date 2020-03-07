@@ -6,6 +6,7 @@ class Speech:
     AUTOOFF="automatic mode disabled"
     ON="powered on" 
     OFF="Shutting down"
+    Restart="Manual Reset Successful"
 
     def __init__(self):
         self.engine = pyttsx3.init()
@@ -21,3 +22,4 @@ if __name__ == "__main__":
     s.speak(Speech.AUTOOFF)
     s.speak(Speech.ON)
     s.speak(Speech.OFF)
+    

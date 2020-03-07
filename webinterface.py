@@ -4,6 +4,7 @@ from threading import Thread
 from motors import MotorController
 from time import time
 from utils import Utils
+from speech import Speech
 
 appThread = None
 claw = None
@@ -11,6 +12,7 @@ app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 flag=1
+speech =Speech()
 
 def run():
     global app
@@ -64,6 +66,14 @@ def gpioFn():
                     claw.closeClaw()
                 else:
                     claw.openClaw()
+            elif act == "arm_rotate":
+                if flag==1:
+                    claw.rotateClawBack()
+                    flag=0
+                else:
+                    claw.rotateClawFront()
+                    flag=1
+                    
     if "arm_height" in request.args.keys():
         try:
             claw.sweepServo('height', int(request.args['arm_height']))
@@ -84,19 +94,16 @@ def gpioFn():
             
     if 'togglemode' in request.args.keys():
         if Utils.mode == 'auto':
+            speech.speak(speech.AUTOOFF)
             Utils.mode = 'manual'
         else:
+            speech.speak(speech.AUTOON)
             Utils.mode = 'auto'
         
         print("Mode changed to {}".format(Utils.mode))
         return Utils.mode
 
-    if 'arm_rotate' in request.args.keys():
-        if flag==1:
-            claw.rotateClawBack()
-            flag=0
-        else:
-            claw.rotateClawFront()
-            flag=1
+    #if 'arm_rotate' in request.args.keys():
+        
             
     return ''

@@ -1,9 +1,10 @@
 from utils import Utils, Pinout
 from gpiozero import DistanceSensor
 from time import sleep
+from speech import Speech
+speech = Speech()
 
 class Distance:
-    
     def begin():
         Distance.sensor = DistanceSensor(echo=Pinout.PIN_ULTRASOINIC_ECHO, trigger=Pinout.PIN_ULTRASOINIC_TRIG)
     
@@ -17,6 +18,7 @@ class Distance:
             print("Stage 0,", d, "cm")
             if(d < 80):
                 print("Something found infront of me! Moving to phase 1")
+                speech.speak(speech.BEGUN)
                 Utils.pickupPhase = 1
                 
         

@@ -55,6 +55,7 @@ nudatus==0.0.4
 numpy==1.16.2
 oauthlib==2.1.0
 olefile==0.46
+opencv-contrib-python==3.4.2.17
 pantilthat==0.0.7
 parso==0.3.1
 pexpect==4.6.0
@@ -84,6 +85,7 @@ pyparsing==2.2.0
 pyserial==3.4
 python-apt==1.8.4
 python-dateutil==2.7.3
+pyttsx3==2.81
 pyxdg==0.25
 pyzmq==17.1.2
 qtconsole==4.3.1

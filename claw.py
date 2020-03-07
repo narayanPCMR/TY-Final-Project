@@ -79,7 +79,7 @@ class Arm:
         arm_b.join()
     
     def rotateClawFront(self):
-        self.sweepServo('rotate',Arm.CLAW_ROTATE_FRONT,0.02).join()
+        self.sweepServo('rotate',Arm.CLAW_ROTATE_FRONT,0.02)
         
     def rotateClawBack(self):
         self.sweepServo('rotate',Arm.CLAW_ROTATE_BACK,0.02).join()
