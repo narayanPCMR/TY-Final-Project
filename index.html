@@ -1,0 +1,260 @@
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="/static/bootstrap.min.css" />
+		<script src="/static/jquery.min.js"></script>
+		<script src="/static/bootstrap.min.js"></script>
+
+		<script>
+		//How fast the Robot will move
+		var MovementSpeed = 0.9;
+
+		//CONSTANTS
+		IO_REQUEST_PAGE = "/ioState";
+
+		//Keyboard KeyCodes
+		KEY_W = 87;
+		KEY_A = 65;
+		KEY_S = 83;
+		KEY_D = 68;
+
+		KEY_UP = 38;
+		KEY_LEFT = 37;
+		KEY_DOWN = 40;
+		KEY_RIGHT = 39;
+
+		/**
+		 * sendMotorSpeed
+		 * Send command to motors to spin in a particular direction
+		 */
+
+		//TODO: One for servos, one for mode, etc.
+		function sendMotorSpeed(motor1Speed, motor2Speed) {
+			var XHR = new XMLHttpRequest();
+			var query = IO_REQUEST_PAGE + "?motor1Speed=" + motor1Speed + "&motor2Speed=" + motor2Speed;
+			
+			XHR.open('GET', query);
+			XHR.send();
+		}
+		
+		function sendMode() {
+			var XHR = new XMLHttpRequest();
+			var query = IO_REQUEST_PAGE + "?togglemode";
+			XHR.open('GET', query);
+			XHR.addEventListener('readystatechange', function(e) {
+				if (XHR.readyState == 4) {
+					var data = XHR.responseText;
+					document.getElementById('mode_text').innerText = "Mode: "+ data;
+				}
+			});
+			XHR.send();
+		}
+
+		function goForward() {
+			sendMotorSpeed(1 * MovementSpeed, 1 * MovementSpeed);
+		}
+
+		function goBackward() {
+			sendMotorSpeed(-1 * MovementSpeed, -1 * MovementSpeed);
+		}
+
+		function turnLeft() {
+			sendMotorSpeed(-1 * MovementSpeed, 1 * MovementSpeed);
+		}
+
+		function turnRight() {
+			sendMotorSpeed(1 * MovementSpeed, -1 * MovementSpeed);
+		}
+
+		function stop() {
+			sendMotorSpeed(0, 0);
+		}
+		
+		function arm_position_raised() {
+			var XHR = new XMLHttpRequest();
+			var query = IO_REQUEST_PAGE + "?action=arm_raise";
+			XHR.open('GET', query);
+			XHR.send();
+		}
+		
+		function arm_position_lowered() {
+			var XHR = new XMLHttpRequest();
+			var query = IO_REQUEST_PAGE + "?action=arm_lower";
+			XHR.open('GET', query);
+			XHR.send();
+		}
+		
+		function setArm(servoName, position) {
+			var XHR = new XMLHttpRequest();
+			var query = IO_REQUEST_PAGE + "?arm_"+servoName+"="+position;
+			XHR.open('GET', query);
+			XHR.send();
+		}
+		
+		function armPercent(percent) {
+			var XHR = new XMLHttpRequest();
+			var query = IO_REQUEST_PAGE + "?arm_percent="+percent;
+			XHR.open('GET', query);
+			XHR.send();
+		}
+		
+		function arm_clawToggle() {
+			var XHR = new XMLHttpRequest();
+			var query = IO_REQUEST_PAGE + "?action=claw_toggle";
+			XHR.open('GET', query);
+			XHR.send();
+		}
+
+        function arm_Rotate() {
+			var XHR = new XMLHttpRequest();
+			var query = IO_REQUEST_PAGE + "?action=arm_rotate";
+			XHR.open('GET', query);
+			XHR.send();
+		}
+		
+		function clickAndTouch(elem, pressFn, releaseFn) {
+			document.getElementById(elem).addEventListener('mousedown', pressFn);
+			document.getElementById(elem).addEventListener('touchstart', pressFn);
+
+			document.getElementById(elem).addEventListener('mouseup', releaseFn);
+			document.getElementById(elem).addEventListener('touchend', releaseFn);
+			document.getElementById(elem).addEventListener('touchcancel', releaseFn);
+		}
+
+		function setEventToDirectionButton(elem, fn) {
+			document.getElementById(elem).addEventListener('mousedown', fn);
+			document.getElementById(elem).addEventListener('touchstart', fn);
+
+			document.getElementById(elem).addEventListener('mouseup', stop);
+			document.getElementById(elem).addEventListener('touchend', stop);
+			document.getElementById(elem).addEventListener('touchcancel', stop);
+		}
+
+		function loaded() {
+			// ---- Forward button ----
+			setEventToDirectionButton('up', goForward);
+			
+			// ---- Backward button ----
+			setEventToDirectionButton('down', goBackward);
+
+			// ---- Rotate Right ----
+			setEventToDirectionButton('right', turnRight);
+			
+			// ---- Rotate Left ----
+			setEventToDirectionButton('left', turnLeft);
+			
+			$('#arm_lift').click(arm_position_raised);
+			$('#arm_lower').click(arm_position_lowered);
+			$('#arm_claw_toggle').click(arm_clawToggle);
+            $('#rotate').click(arm_Rotate);
+			
+
+			// ---- Keyboard ----
+			window.addEventListener('keydown', function(e) {
+				if (!e.repeat) {
+					switch(e.keyCode) {
+						case KEY_W:
+						case KEY_UP:
+							goForward();
+							break;
+						case KEY_A:
+						case KEY_LEFT:
+							turnLeft();
+							break;
+						case KEY_S:
+						case KEY_DOWN:
+							goBackward();
+							break;
+						case KEY_D:
+						case KEY_RIGHT:
+							turnRight();
+							break;
+						
+						case 13:
+						case 10:
+							arm_clawToggle();
+							break;
+						
+						case 82:
+							arm_position_raised();
+							break;
+						case 70:
+							arm_position_lowered();
+							break;
+					}
+				}
+			});
+
+			window.addEventListener('keyup', function(e) {
+				switch(e.keyCode) {
+					case KEY_W:
+					case KEY_A:
+					case KEY_S:
+					case KEY_D:
+					case KEY_UP:
+					case KEY_DOWN:
+					case KEY_LEFT:
+					case KEY_RIGHT:
+						stop();
+						break;
+				}
+			});
+			
+			document.getElementById("auto_manual").addEventListener("click", sendMode);
+		}
+			
+		window.addEventListener('load', loaded);
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<!-- Movement Controls -->
+				<div class="col-sm-4">
+					<table class="table">
+						<tr>
+							<td></td>
+							<td>
+								<button class="btn btn-success btn-lg btn-block" id="up">&#8593</button>
+							</td>
+							<td></td>
+						</tr>
+						
+						<tr>
+							<td><button class="btn btn-info btn-lg btn-block" id="left">&#8592</button></td>
+							<td><button class="btn btn-default btn-lg btn-block" id="auto_manual">Mode</button></td>
+							<td><button class="btn btn-warning btn-lg btn-block" id="right">&#8594</button></td>
+						</tr>
+						
+						<tr>
+							<td></td>
+								<td>
+									<button class="btn btn-danger btn-lg btn-block" id="down">&#8595</button>
+								</td>
+							<td></td>
+						</tr>
+					</table>
+				</div>
+
+				<!-- MJPEG Video Stream -->
+				<div class="col-sm-4">
+					
+				</div>
+				
+				<!-- Arm Controls -->
+				<div class="col-sm-4">
+					<table class="table">
+						<tr>
+							<td><button style="margin:15px" class="btn btn-danger" id="arm_lower">Lower arm</button></td>
+							<td><button style="margin:15px" class="btn btn-success" id="arm_lift">Lift arm</button></td>
+                            <td><button style="margin:15px" class="btn btn-warning" id="arm_claw_toggle">Claw</button></td>
+                            <td><button style="margin:15px" class="btn btn-info" id="arm_rotate">Rotate</button></td>
+						</tr>
+						<tr><td style="text-align:center" colspan="3"><span id="mode_text"></span></td></tr>
+					</table>
+				</div>			
+			</div>
+		</div>
+	</body>
+</html>

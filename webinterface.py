@@ -10,6 +10,8 @@ claw = None
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
+flag=1
+
 def run():
     global app
     app.run(host='0.0.0.0', threaded=True)
@@ -32,7 +34,7 @@ def index():
 
 @app.route('/ioState')
 def gpioFn():
-    global ioc, claw
+    global ioc, claw, flag
     if 'motor1Speed' in request.args.keys():
         try:
             mtrSpeed = float(request.args['motor1Speed'])
@@ -88,5 +90,13 @@ def gpioFn():
         
         print("Mode changed to {}".format(Utils.mode))
         return Utils.mode
+
+    if 'arm_rotate' in request.args.keys():
+        if flag==1:
+            claw.rotateClawBack()
+            flag=0
+        else:
+            claw.rotateClawFront()
+            flag=1
             
     return ''
