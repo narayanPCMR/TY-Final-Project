@@ -105,6 +105,13 @@
 			XHR.open('GET', query);
 			XHR.send();
 		}
+
+        function arm_Rotate() {
+			var XHR = new XMLHttpRequest();
+			var query = IO_REQUEST_PAGE + "?action=arm_rotate";
+			XHR.open('GET', query);
+			XHR.send();
+		}
 		
 		function clickAndTouch(elem, pressFn, releaseFn) {
 			document.getElementById(elem).addEventListener('mousedown', pressFn);
@@ -140,6 +147,7 @@
 			$('#arm_lift').click(arm_position_raised);
 			$('#arm_lower').click(arm_position_lowered);
 			$('#arm_claw_toggle').click(arm_clawToggle);
+            $('#rotate').click(arm_Rotate);
 			
 
 			// ---- Keyboard ----
@@ -240,9 +248,10 @@
 						<tr>
 							<td><button style="margin:15px" class="btn btn-danger" id="arm_lower">Lower arm</button></td>
 							<td><button style="margin:15px" class="btn btn-success" id="arm_lift">Lift arm</button></td>
-							<td><button style="margin:15px" class="btn btn-warning" id="arm_claw_toggle">Claw</button></td>
+                            <td><button style="margin:15px" class="btn btn-warning" id="arm_claw_toggle">Claw</button></td>
+                            <td><button style="margin:15px" class="btn btn-info" id="arm_rotate">Rotate</button></td>
 						</tr>
-						<tr><td style="text-align:center" colspan="3"><span id="mode_text"</span></td></tr>
+						<tr><td style="text-align:center" colspan="3"><span id="mode_text"></span></td></tr>
 					</table>
 				</div>			
 			</div>
