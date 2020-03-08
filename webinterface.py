@@ -28,6 +28,17 @@ def setClawObj(cl):
     global claw
     claw = cl
 
+def toggleMode():
+    if Utils.mode == 'auto':
+        speech.speak(speech.AUTOOFF)
+        Utils.mode = 'manual'
+    else:
+        speech.speak(speech.AUTOON)
+        Utils.mode = 'auto'
+        Utils.pickupPhase = 0
+    
+    print("Mode changed to {}".format(Utils.mode))
+
 #================== Flask app ==================
 
 @app.route('/')
@@ -93,14 +104,7 @@ def gpioFn():
             pass
             
     if 'togglemode' in request.args.keys():
-        if Utils.mode == 'auto':
-            speech.speak(speech.AUTOOFF)
-            Utils.mode = 'manual'
-        else:
-            speech.speak(speech.AUTOON)
-            Utils.mode = 'auto'
-        
-        print("Mode changed to {}".format(Utils.mode))
+        toggleMode()
         return Utils.mode
 
     #if 'arm_rotate' in request.args.keys():

@@ -148,8 +148,9 @@ class DNNDetector:
         detections = []
         for detection in output[0,0,:,:]:
             confidence = detection[2]
-            print("Detection found with confidence:", confidence)
             if confidence > .6:
+                print("Detection found with confidence:", confidence)
+                
                 class_id = int(detection[1])
                 print("Accepted a paper")
                 image_height, image_width, _ = image.shape
@@ -160,7 +161,6 @@ class DNNDetector:
                 box_height = detection[6] - box_y
                 detections.append((box_x, box_y, box_width, box_height))
                 
-                print("Got paper!", confidence)
                 break
                 
         return detections

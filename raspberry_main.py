@@ -32,9 +32,75 @@ if __name__ == "__main__":
     frameNumber = 0
     
     print("Starting")
+    if Utils.mode == "manual":
+        speech.speak(Speech.AUTOOFF)
+    else:
+        speech.speak(Speech.AUTOON)
     
     for img in Camera.waitFrame():
         draw = img.copy()
+        
+        #===Begin automatic mode===
+        if Utils.mode == "auto":
+            Distance.loop()
+            
+            if Utils.pickupPhase == 3:
+                arm.openClaw()
+                arm.armReach()
+                MotorController.speed = 0.7
+                MotorController.forward()
+                arm.closeClaw()
+                MotorController.speed = 0.9
+                MotorController.stop()
+                arm.armRestingPos()
+                print("paper ball grabbed")
+                Utils.pickupPhase=4
+            
+            if Utils.pickupPhase == 4:
+                arm.rotateClawBack()
+                arm.openClaw()
+                arm.rotateClawFront()
+                arm.closeClaw()
+                print("paper ball put in dustbin")
+                Utils.pickupPhase=0
+                Tracker.AllTrackers = []
+                
+            if Utils.pickupPhase == 2:
+                if len(Tracker.AllTrackers) > 0:
+                    Tracker.AllTrackers[0].track(img)
+                    t = time()
+                    
+                    while time() - t < 0.2:
+                        d = Distance.distance()
+                        print(d)
+                        
+                        if d <= 25.0:
+                            Utils.pickupPhase = 3
+                            break
+                        
+                        tObj = Tracker.AllTrackers[0]
+                        
+                        #print("Tracker at:", tObj.x, tObj.y, tObj.w, tObj.h)
+                        
+                        #Calculate middle of rectangle, which is the actual value
+                        actualX = (tObj.x+tObj.w/2)
+                        targetX = 0.5
+                        xError = targetX - actualX
+                        
+                        print("Error value is {:.3f}".format(xError))
+                        
+                        turnSpeed = xError * TURNFACTOR
+                        
+                        MotorController.customControl((max(min(0.7 + turnSpeed, 1), 0), max(min(0.7 - turnSpeed, 1), 0)))
+                        
+                    MotorController.stop()
+                    #~ 2 frames
+                    #sleep(0.5)
+                else:
+                    #Object lost, go back to detecting
+                    Utils.pickupPhase = 0
+        
+        #===End of automatic mode===
         
         #Draw trackers
         for t in Tracker.AllTrackers:
@@ -47,64 +113,6 @@ if __name__ == "__main__":
             cv2.putText(draw, text, (x - 10, y - 10),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             cv2.rectangle(draw, (x, y), (x + w, y + h), color)
-        
-        Distance.loop()
-        
-        if Utils.pickupPhase == 3:
-            arm.openClaw()
-            arm.armReach()
-            MotorController.speed = 0.7
-            MotorController.forward()
-            arm.closeClaw()
-            MotorController.speed = 0.9
-            MotorController.stop()
-            arm.armRestingPos()
-            print("paper ball grabbed")
-            Utils.pickupPhase=4
-        
-        if Utils.pickupPhase == 4:
-            arm.rotateClawBack()
-            arm.openClaw()
-            arm.rotateClawFront()
-            arm.closeClaw()
-            print("paper ball put in dustbin")
-            Utils.pickupPhase=0
-            Tracker.AllTrackers = []
-            
-        if Utils.pickupPhase == 2:
-            if len(Tracker.AllTrackers) > 0:
-                Tracker.AllTrackers[0].track(img)
-                t = time()
-                
-                while time() - t < 0.2:
-                    d = Distance.distance()
-                    print(d)
-                    
-                    if d <= 25.0:
-                        Utils.pickupPhase = 3
-                        break
-                    
-                    tObj = Tracker.AllTrackers[0]
-                    
-                    #print("Tracker at:", tObj.x, tObj.y, tObj.w, tObj.h)
-                    
-                    #Calculate middle of rectangle, which is the actual value
-                    actualX = (tObj.x+tObj.w/2)
-                    targetX = 0.5
-                    xError = targetX - actualX
-                    
-                    print("Error value is {:.3f}".format(xError))
-                    
-                    turnSpeed = xError * TURNFACTOR
-                    
-                    MotorController.customControl((max(min(0.7 + turnSpeed, 1), 0), max(min(0.7 - turnSpeed, 1), 0)))
-                    
-                MotorController.stop()
-                #~ 2 frames
-                #sleep(0.5)
-            else:
-                #Object lost, go back to detecting
-                Utils.pickupPhase = 0
         
         frameNumber += 1
         cv2.imshow("Win", draw)
@@ -121,11 +129,14 @@ if __name__ == "__main__":
             Tracker(bbox, img)
             Utils.pickupPhase = 2
         
+        
         if k == ord("c"):
-            
             Tracker.AllTrackers = []
             speech.speak(speech.Restart)
             Utils.pickupPhase = 0
+        
+        if k == ord('m'):
+            webinterface.toggleMode()
         
         if k == ord('q') or k == 27:
             speech.speak(speech.OFF)
