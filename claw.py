@@ -11,7 +11,7 @@ class Arm:
     ARM_L_DOWN = 2250
     ARM_H_REST = 1800
     ARM_H_DOWN = 600
-    CLAW_ROTATE_FRONT = 500
+    CLAW_ROTATE_FRONT = 600
     CLAW_ROTATE_BACK = 2500
 
     
